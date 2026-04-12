@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { store } from "@workspace/utils/store/zustand";
 import { useShallow } from "zustand/shallow";
 import QRScanner from "./components/qr-code";
+import FaceRegistration from "./components/face-registration";
 import { useNavigate } from "react-router";
 
 // const BACKEND_URL = 'https://attendx-t48b.onrender.com'
@@ -187,7 +188,6 @@ export function DashBoard() {
             </div>
         );
     }
-
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f0f5ff] via-[#f0f5ff] to-[#1c69e3]/5">
             <nav className="top-0 z-50 sticky border-b border-[#eceef5]/50 backdrop-blur-3xl bg-[#ffffff]/50">
@@ -301,6 +301,19 @@ export function DashBoard() {
                                 </div>
                             )
                         }) : null}
+                    </div>
+
+                    <div className="w-full flex items-center mb-6">
+                        <div>
+                            <h3 className="text-2xl font-medium">Face Biometric Setup</h3>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Register your face for secure attendance verification.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mb-8 animate-slide-up-delay-2">
+                        <FaceRegistration />
                     </div>
 
                     <div className="w-full flex items-center mb-6">
