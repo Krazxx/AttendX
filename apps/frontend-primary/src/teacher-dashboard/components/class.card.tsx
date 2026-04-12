@@ -49,7 +49,6 @@ export default function ClassCard({
   };
 
   const days = ["MON", "TUE", "WED", "THU", "FRI"];
-
   return (
     <div
       className={`bg-card border border-border rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-500 ${animationDelay}`}
