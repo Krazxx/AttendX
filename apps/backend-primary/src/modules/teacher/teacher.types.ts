@@ -1,3 +1,11 @@
+export interface Teacher {
+    userId:string
+    teacherId: number
+    dept: string
+    qualification: string
+    office: string
+}
+
 export interface QrGenerationSchema {
     lectureId: string
 }

@@ -1,5 +1,60 @@
 import { create } from 'zustand'
 
+type Period = {
+    id: string;
+    subject: {
+        id: string;
+        name: string;
+    };
+    startTime: string;
+    teacher: {
+        user: {
+            name: string;
+        };
+    };
+};
+
+type TimetableItem = {
+    id: string;
+    day: string;
+    periods: Period[];
+};
+
+type EnrollStudents = {
+    id: string,
+    student: {
+        id: string,
+        rollNum: string
+    }
+}
+
+type EnrollSubject = {
+    subject: {
+        id: string
+        name: string,
+        courseCode: string,
+        enrolledSubjects: Array<EnrollStudents>
+    }
+}
+
+type Subject = {
+    id: string,
+    name: string,
+    courseCode: string
+}
+
+type Class = {
+    id: string
+    name: string
+}
+
+type StudentName = {
+    rollNum: string
+    user: {
+        name: string
+    }
+}
+
 type authPage = {
     SignIn: boolean,
     setSignIn: (value: boolean) => void
@@ -8,7 +63,6 @@ type authPage = {
         id: string,
         name: string,
         username: string,
-        role: string
     } | null
     setUser: (token: string) => Promise<void>
 
@@ -18,25 +72,76 @@ type authPage = {
     student: {
         id: string
         rollNum: string,
-        class: string,
         createdAt: Date,
-        course: string
+        course: string,
+        enrolledSubjects: Array<EnrollSubject> | null
     } | null
 
-    setStudent: (token: string) => Promise<void>
+    enrollSubjects: Array<EnrollSubject> | null
 
-    timeTable: Array<string> | null,
-    setTimeTable: (token: string) => Promise<void>
+    class: {
+        name: string
+    } | null
+
+    timeTable: Array<TimetableItem> | null
+
+    teacherEnolledClass: Array<Class> | null
+
+    teacherEnrolledSubject: Array<Subject> | null
+
+    classList: {
+        id: string,
+        name: string,
+        students: Array<StudentName>
+    }[] | null
 
     teacher: {
-        id: string,
         teacherId: number,
         dept: string,
-        subjects: Array<object>
-        classes: Array<object>
+        office: string,
+        createdAt: Date,
+        qualification: string
     } | null
 
     setTeacher: (token: string) => Promise<void>
+
+    teacherDash : {
+        id: string;
+        name: string;
+        teacher: {
+            id: string;
+            classes: {
+                id: string;
+                name: string;
+                students: {
+                    id: string;
+                    rollNum: number;
+                    enrolledSubjects: {
+                        id: string;
+                        subject: {
+                            id: string;
+                            name: string;
+                            courseCode: string;
+                        };
+                    }[];
+                }[];
+                weeklyTimeTable: {
+                    day: string;
+                    periods: {
+                        id: string;
+                        startTime: string | Date;
+                        subject: {
+                            name: string;
+                            courseCode: string;
+                        };
+                        teacher: {
+                            id: string;
+                        };
+                    }[];
+                }[];
+            }[];
+        } | null;
+    } | null;
 }
 
 export const store = create<authPage>((set) => ({
@@ -44,8 +149,13 @@ export const store = create<authPage>((set) => ({
     setSignIn: (value: boolean) => set({ SignIn: value }),
 
     user: null,
+    timeTable: null,
+    class: null,
+    student: null,
+    enrollSubjects: null,
+
     setUser: async (token: string) => {
-        const res = await fetch("http://localhost:3000/api/user", {
+        const res = await fetch("https://attendx-t48b.onrender.com/api/student-dashboard", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -54,46 +164,26 @@ export const store = create<authPage>((set) => ({
         })
 
         const data = await res.json();
-        set({ user: data.data })
+        console.log(data.data.user)
+        set({ user: data.data.user })
+        set({ enrollSubjects: data.data.user.student.enrolledSubjects })
+        set({ timeTable: data.data.user.student.class.weeklyTimeTable })
+        set({ class: data.data.user.student.class })
+        set({ student: data.data.user.student })
     },
 
     role: null,
     setRole: (value: "TEACHER" | "STUDENT") => set({ role: value }),
 
-    student: null,
-    setStudent: async (token: string) => {
-
-        const res = await fetch("http://localhost:3000/api/student/get-student", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "authorization": `Bearer ${token}`
-            }
-        });
-        const data = await res.json();
-
-        set({ student: data.data });
-    },
-
-    timeTable: null,
-    setTimeTable: async (token: string) => {
-
-        const res = await fetch("http://localhost:3000/api/student/timeTable", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "authorization": `Bearer ${token}`
-            }
-        })
-
-        const data = await res.json();
-
-        set({ timeTable: data.data.class.timeTable })
-    },
 
     teacher: null,
+    classList: null,
+    teacherEnolledClass: null,
+    teacherEnrolledSubject: null,
+    teacherDash: null,
+
     setTeacher: async (token: string) => {
-        const res = await fetch("http://localhost:3000/api/teacher/get-teacher", {
+        const res = await fetch("https://attendx-t48b.onrender.com/api/teacher/get-teacher/dashboard", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -102,6 +192,13 @@ export const store = create<authPage>((set) => ({
         })
 
         const data = await res.json();
-        set({ teacher: data.data });
+        console.log(data);
+        set({ teacherDash: data.dashboard })
+        set({ user: data.dashboard });
+        set({ teacher: data.dashboard.teacher });
+        set({ teacherEnolledClass: data.dashboard.teacher.classes });
+        set({ teacherEnrolledSubject: data.dashboard.teacher.subjects });
+        set({ classList: data.dashboard.teacher.classes })
     }
+
 }))

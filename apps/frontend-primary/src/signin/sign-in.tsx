@@ -11,7 +11,7 @@ export function SignIn() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const res = await fetch("http://localhost:3000/api/user/signin", {
+        const res = await fetch("https://attendx-t48b.onrender.com/api/user/signin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -23,10 +23,9 @@ export function SignIn() {
         })
 
         const data = await res.json();
-        console.log(data);
 
         localStorage.setItem("token", data.data)
-        navigate("/student-dashboard")
+        data.user.role === "TEACHER" ? navigate("/teacher-dashboard") : navigate("/student-dashboard")
     }
 
     const setSignIn = store((s) => s.setSignIn)
@@ -76,6 +75,7 @@ export function SignIn() {
                     </div>
 
                     <button
+                        
                         type="submit"
                         className="w-full border border-[#1D6AE4] text-white bg-[#1D6AE4] px-3 py-2 rounded-xl hover:bg-blue-500 cursor-pointer">
                         Sign In

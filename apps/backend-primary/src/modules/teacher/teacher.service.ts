@@ -1,8 +1,16 @@
 import { TeacherRepository } from "@workspace/backend/modules/teacher/teacher.repository";
-import { ClassSchema, SubjectSchema, LectureSchema, EventSchema, ClassTimeTableSchema } from "@workspace/backend/modules/teacher/teacher.types";
+import {Teacher, ClassSchema, SubjectSchema, LectureSchema, EventSchema, ClassTimeTableSchema } from "@workspace/backend/modules/teacher/teacher.types";
 
 export class TeacherService {
     private repo = new TeacherRepository();
+
+    async createTeacher(data: Teacher) {
+        return await this.repo.createTeacher(data);
+    }
+
+    async getTeacherDashboard(userId: string) {
+        return await this.repo.getTeacherDashboard(userId);
+    }
 
     async getTeacherById(userId: string) {
         return await this.repo.getTeacherByUserId(userId);
